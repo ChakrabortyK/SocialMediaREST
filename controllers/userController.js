@@ -2,8 +2,15 @@ import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 
 const getAllUsers = async (req, res) => {
-  const allUsers = await User.find();
-  // console.log(allUsers);
+  let allUsers;
+  try {
+    allUsers = await User.find();
+    if (allUsers.length == 0) {
+      return res.status(404).json({ message: "No Users found" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
   return res.status(200).json(allUsers);
 };
 
@@ -25,6 +32,7 @@ const createUser = async (req, res) => {
     name,
     email,
     password: hashedPW,
+    blogs: [],
   });
 
   try {
@@ -38,13 +46,13 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   const existingUser = await User.findOne({ email });
-
+  // console.log(existingUser); //returns null if no user is found
   if (!existingUser) {
     return res.status(404).json({ message: "No user found" });
   }
 
   const isMatch = bcrypt.compareSync(password, existingUser.password);
-  console.log(isMatch);
+  // console.log(isMatch); //returns true or false
   if (!isMatch) {
     return res.status(400).json({ message: "Invalid Credentials" });
   }

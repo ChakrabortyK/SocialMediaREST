@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Blogs from "../models/blogModel.js";
+import User from "../models/userModel.js";
 
 const getAllBlogs = async (req, res) => {
   try {
@@ -13,11 +15,12 @@ const getAllBlogs = async (req, res) => {
     return res.status(500).json({ message: error });
   }
 };
+
 const getBlogById = async (req, res) => {
   try {
     const id = req.params.id;
     const blogs = await Blogs.findById(id);
-    console.log(blogs);
+    // console.log(blogs);
     if (!blogs) {
       return res.status(404).json({ message: "No blogs found" });
     }
@@ -30,6 +33,15 @@ const getBlogById = async (req, res) => {
 
 const addBlog = async (req, res) => {
   const { title, description, image, user } = req.body;
+  let existingUser = null;
+  try {
+    existingUser = await User.findById(user);
+  } catch (error) {
+    console.log(error);
+  }
+  if (!existingUser) {
+    return res.status(404).json({ message: "unable to find user" });
+  }
   const blog = new Blogs({
     title,
     description,
@@ -38,7 +50,13 @@ const addBlog = async (req, res) => {
   });
 
   try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     const blogRes = await blog.save();
+    existingUser.blogs.push(blogRes);
+    // console.log(existingUser);
+    await existingUser.save();
+    await session.commitTransaction();
     return res.status(201).json(blogRes);
   } catch (error) {
     console.log(error);
@@ -69,4 +87,16 @@ const updateBlog = async (req, res) => {
   }
 };
 
-export { getAllBlogs, addBlog, updateBlog, getBlogById };
+const deleteById = async (req, res) => {
+  const blogId = req.params.id;
+
+  try {
+    const blog = await Blogs.findByIdAndDelete(blogId);
+    return res.status(200).json(blog);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export { getAllBlogs, addBlog, updateBlog, getBlogById, deleteById };
