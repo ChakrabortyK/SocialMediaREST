@@ -91,12 +91,23 @@ const deleteById = async (req, res) => {
   const blogId = req.params.id;
 
   try {
-    const blog = await Blogs.findByIdAndDelete(blogId);
-    return res.status(200).json(blog);
+    const blog = await Blogs.findByIdAndDelete(blogId).populate("user");
+    // console.log("blog populated: " + blog);
+    // const pullrecord = await blog.user.blogs.pull(blogId);//pulls the remaining ids
+    // console.log("pullrecord: " + pullrecord);
+    if (!blog) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+    await blog.user.save();
+    return res
+      .status(200)
+      .json({ message: "Successfully Deleted", deletedBlog: blog });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+const getBlogByUserId = async (req, res) => {};
 
 export { getAllBlogs, addBlog, updateBlog, getBlogById, deleteById };

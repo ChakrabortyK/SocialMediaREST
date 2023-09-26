@@ -1,1 +1,29 @@
-youtube.com/watch?v=_ee38nL13mE&list=PL5T8zbMIdMbo6UjHsCgd4qrxoL2r6Lv4y&index=3&t=892s
+youtube.com/watch?v=\_ee38nL13mE&list=PL5T8zbMIdMbo6UjHsCgd4qrxoL2r6Lv4y&index=3&t=892s
+
+GETUSER: localhost:3000/user
+GETBLOGS: localhost:3000/blog
+GETUSERBYID: localhost:3000/user/:id
+GETBLOGBYID: localhost:3000/blog/:id
+
+POST NEW BLOG: localhost:3000/blog/new
+{
+"title": "DeleteBlog3",
+"description": "This is a sample description.",
+"image": "notcomplicated",
+"user": "6512f445247242e39f19cabb"
+}
+
+POST USER SIGNUP: localhost:3000/user/signup
+{
+"name": "DeleteUser",//name=pass
+"email": "2ndUser@gmail.in",
+"password": "DeleteUser"
+}
+
+POST USER LOGIN: localhost:3000/user/login
+{
+"email": "2ndUser@gmail.in",
+"password": "DeleteUser"
+}
+
+UPDATEBLOG
